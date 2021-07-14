@@ -72,11 +72,13 @@ int TabContainer::_get_top_margin() const {
 }
 
 void TabContainer::_gui_input(const Ref<InputEvent> &p_event) {
+	ERR_FAIL_COND(p_event.is_null());
+
 	Ref<InputEventMouseButton> mb = p_event;
 
 	Popup *popup = get_popup();
 
-	if (mb.is_valid() && mb->is_pressed() && mb->get_button_index() == BUTTON_LEFT) {
+	if (mb.is_valid() && mb->is_pressed() && mb->get_button_index() == MOUSE_BUTTON_LEFT) {
 		Point2 pos(mb->get_position().x, mb->get_position().y);
 		Size2 size = get_size();
 
@@ -392,6 +394,7 @@ void TabContainer::_notification(int p_what) {
 			Vector<int> tab_widths;
 			for (int i = first_tab_cache; i < tabs.size(); i++) {
 				if (get_tab_hidden(i)) {
+					tab_widths.push_back(0);
 					continue;
 				}
 				int tab_width = _get_tab_width(i);
@@ -583,7 +586,7 @@ void TabContainer::_refresh_texts() {
 		Control *control = Object::cast_to<Control>(tabs[i]);
 		String text = control->has_meta("_tab_name") ? String(tr(String(control->get_meta("_tab_name")))) : String(tr(control->get_name()));
 		Ref<TextLine> name;
-		name.instance();
+		name.instantiate();
 		name->set_direction(rtl ? TextServer::DIRECTION_RTL : TextServer::DIRECTION_LTR);
 		name->add_string(text, font, font_size, Dictionary(), TranslationServer::get_singleton()->get_tool_locale());
 		text_buf.push_back(name);
@@ -645,7 +648,7 @@ int TabContainer::_get_tab_width(int p_index) const {
 	// Get the width of the text displayed on the tab.
 	Ref<Font> font = get_theme_font("font");
 	int font_size = get_theme_font_size("font_size");
-	String text = control->has_meta("_tab_name") ? String(tr(String(control->get_meta("_tab_name")))) : String(control->get_name());
+	String text = control->has_meta("_tab_name") ? String(tr(String(control->get_meta("_tab_name")))) : String(tr(control->get_name()));
 	int width = font->get_string_size(text, font_size).width;
 
 	// Add space for a tab icon.
@@ -1023,6 +1026,7 @@ void TabContainer::set_tab_title(int p_tab, const String &p_title) {
 	Control *child = _get_tab(p_tab);
 	ERR_FAIL_COND(!child);
 	child->set_meta("_tab_name", p_title);
+	_refresh_texts();
 	update();
 }
 

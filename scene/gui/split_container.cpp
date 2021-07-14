@@ -38,7 +38,7 @@ Control *SplitContainer::_getch(int p_idx) const {
 
 	for (int i = 0; i < get_child_count(); i++) {
 		Control *c = Object::cast_to<Control>(get_child(i));
-		if (!c || !c->is_visible_in_tree()) {
+		if (!c || !c->is_visible()) {
 			continue;
 		}
 		if (c->is_set_as_top_level()) {
@@ -207,6 +207,8 @@ void SplitContainer::_notification(int p_what) {
 }
 
 void SplitContainer::_gui_input(const Ref<InputEvent> &p_event) {
+	ERR_FAIL_COND(p_event.is_null());
+
 	if (collapsed || !_getch(0) || !_getch(1) || dragger_visibility != DRAGGER_VISIBLE) {
 		return;
 	}
@@ -214,7 +216,7 @@ void SplitContainer::_gui_input(const Ref<InputEvent> &p_event) {
 	Ref<InputEventMouseButton> mb = p_event;
 
 	if (mb.is_valid()) {
-		if (mb->get_button_index() == BUTTON_LEFT) {
+		if (mb->get_button_index() == MOUSE_BUTTON_LEFT) {
 			if (mb->is_pressed()) {
 				int sep = get_theme_constant("separation");
 
@@ -351,7 +353,7 @@ void SplitContainer::_bind_methods() {
 
 	ADD_PROPERTY(PropertyInfo(Variant::INT, "split_offset"), "set_split_offset", "get_split_offset");
 	ADD_PROPERTY(PropertyInfo(Variant::BOOL, "collapsed"), "set_collapsed", "is_collapsed");
-	ADD_PROPERTY(PropertyInfo(Variant::INT, "dragger_visibility", PROPERTY_HINT_ENUM, "Visible,Hidden,Hidden & Collapsed"), "set_dragger_visibility", "get_dragger_visibility");
+	ADD_PROPERTY(PropertyInfo(Variant::INT, "dragger_visibility", PROPERTY_HINT_ENUM, "Visible,Hidden,Hidden and Collapsed"), "set_dragger_visibility", "get_dragger_visibility");
 
 	BIND_ENUM_CONSTANT(DRAGGER_VISIBLE);
 	BIND_ENUM_CONSTANT(DRAGGER_HIDDEN);
